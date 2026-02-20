@@ -36,14 +36,11 @@ export class PayoutProvider implements IPayoutProvider {
   constructor({ logger, configModule }: InjectedDependencies) {
     this.logger_ = logger;
 
-    const moduleDef = configModule.modules?.[PAYOUT_MODULE];
-    if (typeof moduleDef !== "boolean" && moduleDef?.options) {
-      this.config_ = {
-        apiKey: process.env.STRIPE_SECRET_API_KEY as string,
-        webhookSecret: process.env
-          .STRIPE_CONNECTED_ACCOUNTS_WEBHOOK_SECRET as string,
-      };
-    }
+    this.config_ = {
+      apiKey: process.env.STRIPE_SECRET_API_KEY as string,
+      webhookSecret: process.env
+        .STRIPE_CONNECTED_ACCOUNTS_WEBHOOK_SECRET as string,
+    };
 
     this.client_ = new Stripe(this.config_.apiKey, {
       apiVersion: "2025-02-24.acacia",
