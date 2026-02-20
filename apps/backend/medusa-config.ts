@@ -4,17 +4,11 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
   admin: {
-    disable: true // Disable built-in admin - using separate admin-panel container
+    disable: false
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
-    databaseDriverOptions: process.env.NODE_ENV === 'production' ? {
-      connection: { 
-        ssl: {
-          rejectUnauthorized: false
-        }
-      }
-    } : undefined,
+    redisUrl: process.env.REDIS_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
