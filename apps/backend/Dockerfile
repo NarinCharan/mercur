@@ -21,8 +21,10 @@ WORKDIR /app
 RUN yarn global add turbo
 
 # First install dependencies (as they change less often)
+# Force NODE_ENV=development so devDependencies (rimraf, tsc, etc.) are installed
+ENV NODE_ENV=development
 COPY --from=builder /app/out/json/ .
-RUN yarn install
+RUN yarn install --frozen-lockfile || yarn install
 
 # Build the project and its dependencies
 COPY --from=builder /app/out/full/ .
