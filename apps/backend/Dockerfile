@@ -31,6 +31,9 @@ COPY --from=builder /app/out/full/ .
 
 RUN turbo build
 
+# Create symlink so medusa start can find the admin panel build
+RUN cd apps/backend && ln -s .medusa/server/public/ public
+
 FROM base AS runner
 WORKDIR /app
 
