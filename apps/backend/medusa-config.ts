@@ -28,13 +28,18 @@ module.exports = defineConfig({
       resolve: '@mercurjs/commission',
       options: {}
     },
-    {
-      resolve: '@mercurjs/algolia',
-      options: {
-        apiKey: process.env.ALGOLIA_API_KEY,
-        appId: process.env.ALGOLIA_APP_ID
-      }
-    },
+    // Algolia: only load if configured
+    ...(process.env.ALGOLIA_APP_ID
+      ? [
+          {
+            resolve: '@mercurjs/algolia',
+            options: {
+              apiKey: process.env.ALGOLIA_API_KEY,
+              appId: process.env.ALGOLIA_APP_ID
+            }
+          }
+        ]
+      : []),
     {
       resolve: '@mercurjs/reviews',
       options: {}
@@ -43,10 +48,15 @@ module.exports = defineConfig({
       resolve: '@mercurjs/requests',
       options: {}
     },
-    {
-      resolve: '@mercurjs/resend',
-      options: {}
-    }
+    // Resend: only load if configured
+    ...(process.env.RESEND_API_KEY
+      ? [
+          {
+            resolve: '@mercurjs/resend',
+            options: {}
+          }
+        ]
+      : [])
   ],
   modules: [
     ...(process.env.S3_ACCESS_KEY_ID
@@ -72,37 +82,47 @@ module.exports = defineConfig({
           }
         ]
       : []),
-    {
-      resolve: '@medusajs/medusa/payment',
-      options: {
-        providers: [
+    // Stripe Connect: only load if configured
+    ...(process.env.STRIPE_SECRET_API_KEY
+      ? [
           {
-            resolve:
-              '@mercurjs/payment-stripe-connect/providers/stripe-connect',
-            id: 'stripe-connect',
+            resolve: '@medusajs/medusa/payment',
             options: {
-              apiKey: process.env.STRIPE_SECRET_API_KEY,
-              webhookSecret:
-                process.env.STRIPE_PAYMENT_WEBHOOK_SECRET ??
-                process.env.STRIPE_WEBHOOK_SECRET
+              providers: [
+                {
+                  resolve:
+                    '@mercurjs/payment-stripe-connect/providers/stripe-connect',
+                  id: 'stripe-connect',
+                  options: {
+                    apiKey: process.env.STRIPE_SECRET_API_KEY,
+                    webhookSecret:
+                      process.env.STRIPE_PAYMENT_WEBHOOK_SECRET ??
+                      process.env.STRIPE_WEBHOOK_SECRET
+                  }
+                }
+              ]
             }
           }
         ]
-      }
-    },
+      : []),
     {
       resolve: '@medusajs/medusa/notification',
       options: {
         providers: [
-          {
-            resolve: '@mercurjs/resend/providers/resend',
-            id: 'resend',
-            options: {
-              channels: ['email'],
-              api_key: process.env.RESEND_API_KEY,
-              from: process.env.RESEND_FROM_EMAIL
-            }
-          },
+          // Resend: only if configured
+          ...(process.env.RESEND_API_KEY
+            ? [
+                {
+                  resolve: '@mercurjs/resend/providers/resend',
+                  id: 'resend',
+                  options: {
+                    channels: ['email'],
+                    api_key: process.env.RESEND_API_KEY,
+                    from: process.env.RESEND_FROM_EMAIL
+                  }
+                }
+              ]
+            : []),
           {
             resolve: '@medusajs/medusa/notification-local',
             id: 'local',
